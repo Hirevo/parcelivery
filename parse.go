@@ -28,7 +28,7 @@ func parseFromFile(path string) (*Environment, error) {
 		return nil, fmt.Errorf("input: file comports less than the minimum of 2 lines")
 	}
 
-	initial := lines[0]
+	initial := strings.TrimSpace(lines[0])
 	initialParts := strings.Split(initial, " ")
 	if len(initialParts) != 3 {
         return nil, fmt.Errorf("input(line 1): unexpected count of components for environment")
@@ -45,7 +45,7 @@ func parseFromFile(path string) (*Environment, error) {
 
 	currentLine := 1
 	for currentLine < (lineCount - 1) {
-		parcelParts := strings.Split(lines[currentLine], " ")
+		parcelParts := strings.Split(strings.TrimSpace(lines[currentLine]), " ")
 		if len(parcelParts) == 3 {
 			// this line is potentially describing a transport, moving onto the next stage...
 			break
