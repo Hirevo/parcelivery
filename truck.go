@@ -38,15 +38,14 @@ func (truck *Truck) NextTurn(env *Environment) (Event, EndState) {
 
 	switch truck.State {
 	case TSWaiting:
-		if (env.TurnCount == 1) || len(undeliveredParcels) == 0 || int(undeliveredParcels[0].Weight) > (truck.MaxCharge - truck.CurCharge) {
+		if (env.TurnCount == 1) || len(undeliveredParcels) == 0 || int(undeliveredParcels[0].Weight) > (truck.MaxCharge - truck.CurCharge) || env.NeedsToGo {
+			env.NeedsToGo = false
 			return Event{Kind: EKTruckGone, Truck: truck}, ESContinue
 		}
 		return Event{Kind: EKTruckWaiting, Truck: truck}, ESContinue
 	case TSGone:
-		// truck.GoneUntil--
 		if truck.GoneUntil == 0 {
-			// truck.State = TSWaiting
-			// truck.CurCharge = 0
+			env.NeedsToGo = false
 			return Event{Kind: EKTruckWaiting, Truck: truck}, ESContinue
 		}
 		return Event{Kind: EKTruckGone, Truck: truck}, ESContinue

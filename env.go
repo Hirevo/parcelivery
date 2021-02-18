@@ -7,6 +7,9 @@ type (
 		Parcels    []*Parcel
 		Transports []*Transport
 		Truck      *Truck
+
+		// used to ping the truck that it needs to go to empty its charge
+		NeedsToGo  bool
 	}
 
 	EndState int

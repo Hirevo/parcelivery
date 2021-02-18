@@ -67,33 +67,31 @@ func (tile Tile) ClosestAvailableAround(to Tile) Tile {
 	var seen []Tile
 
 	for {
-		var considered []Tile
-		var foundFree bool
+		var foundFree = false
+		var considered = []Tile{}
 
-		for _, tile := range queue {
+		for _, it := range queue {
 			for _, dir := range directions {
-				position := Position{X: tile.Position.X + dir[0], Y: tile.Position.Y + dir[1]}
-				target := tile.env.At(position)
+				position := Position{X: it.Position.X + dir[0], Y: it.Position.Y + dir[1]}
+				target := it.env.At(position)
 				if target != nil {
 					considered = append(considered, *target)
 					foundFree = foundFree || target.Free()
 				}
 			}
+
+			seen = append(seen, it)
 		}
 
 		if foundFree {
 			freeTiles := funk.Filter(considered, func(it interface{}) bool {
-				return it.(Tile).Free() || it.(Tile) == to
+				return it.(Tile).Free() || it.(Tile) == tile
 			}).([]Tile)
-			sort.Sort(byDistance{from: to, tiles: freeTiles})
+			sort.Sort(byDistance{from: tile, tiles: freeTiles})
 			return freeTiles[0]
 		}
 
 		leftDifference, _ := funk.Difference(considered, seen)
-		newQueue := leftDifference.([]interface{})
-		queue = make([]Tile, 0, len(newQueue))
-		for _, it := range newQueue {
-			queue = append(queue, it.(Tile))
-		}
+		queue = leftDifference.([]Tile)
 	}
 }

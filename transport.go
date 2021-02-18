@@ -47,6 +47,10 @@ func (transport *Transport) PickParcel(env *Environment) (Event, bool) {
 
 // GoTowardsTruck makes one move closer to the truck or waits if it could not make progress reaching it
 func (transport *Transport) GoTowardsTruck(env *Environment) (Event, EndState) {
+	if int(transport.Carrying.Weight) > (env.Truck.MaxCharge-env.Truck.CurCharge) {
+		env.NeedsToGo = true
+	}
+
 	from := *env.At(transport.Position)
 	to := *env.At(env.Truck.Position)
 	path, _, ok := astar.Path(from, from.ClosestAvailableAround(to))
@@ -70,11 +74,28 @@ func (transport *Transport) GoTowardsClosestParcel(env *Environment) (Event, End
 	from := *env.At(transport.Position)
 
 	freeParcels := funk.Filter(env.Parcels, func(it interface{}) bool {
-		return it.(*Parcel).State == PSFree
+		parcel := it.(*Parcel)
+		return parcel.State == PSFree
 	}).([]*Parcel)
 
+	if len(freeParcels) == 0 {
+		// got nothing to do
+		return Event{Kind: EKTransportWaiting, Transport: transport}, ESContinue
+	}
+
+	deliverableParcels := funk.Filter(freeParcels, func(it interface{}) bool {
+		parcel := it.(*Parcel)
+		return int(parcel.Weight) <= (env.Truck.MaxCharge - env.Truck.CurCharge)
+	}).([]*Parcel)
+
+	if len(deliverableParcels) == 0 {
+		// nothing atteignable is deliverable, pinging the truck it may need to go
+		env.NeedsToGo = true
+		deliverableParcels = freeParcels
+	}
+
 	var paths [][]Tile
-	for _, parcel := range freeParcels {
+	for _, parcel := range deliverableParcels {
 		to := *env.At(parcel.Position)
 		path, _, ok := astar.Path(from, to.ClosestAvailableAround(from))
 		if ok && len(path) > 1 {
@@ -98,7 +119,6 @@ func (transport *Transport) GoTowardsClosestParcel(env *Environment) (Event, End
 
 // NextTurn computes what this transport should do for the turn
 func (transport *Transport) NextTurn(env *Environment) (Event, EndState) {
-	// fmt.Println(transport.Position)
 	if transport.Carrying != nil {
 		if event, done := transport.DeliverParcel(env); done {
 			return event, ESContinue
