@@ -1,0 +1,4 @@
+10 50 100000
+colis 1 1 blue
+pallettruck 0 0
+0 49 500 5

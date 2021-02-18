@@ -1,0 +1,23 @@
+10 30 100000
+c_1 7 0 blue
+c_2 8 0 green
+c_3 9 0 blue
+c_4 7 1 yellow
+c_5 8 1 blue
+c_6 9 1 yellow
+c_7 7 2 blue
+c_8 8 2 green
+c_9 9 2 yellow
+c_10 4 10 green
+c_11 3 11 blue
+c_12 8 11 green
+c_13 2 15 yellow
+c_14 4 16 blue
+c_15 8 17 green
+c_16 1 18 yellow
+c_17 0 21 blue
+c_18 0 23 green
+c_19 9 29 blue
+pallettruck_1 0 0
+pallettruck_2 4 16
+0 29 550 2

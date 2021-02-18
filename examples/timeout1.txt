@@ -1,0 +1,4 @@
+5 5 10
+colis 4 4 green
+pallettruck 0 0
+3 4 4000 5

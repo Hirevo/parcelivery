@@ -1,0 +1,2 @@
+transpalette 0 0
+3 4 4000 5
